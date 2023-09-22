@@ -56,7 +56,7 @@ func createReply(db *sqlx.DB, post_id int, content string) {
 
 func getAllPosts(db *sqlx.DB) {
 	posts := []Post{}
-	err = db.Select(&posts, "select * from posts")
+	err := db.Select(&posts, "select * from posts")
 	if err != nil {
 		log.Println(err)
 	}
@@ -66,7 +66,6 @@ func getAllPosts(db *sqlx.DB) {
 }
 
 func getPostReplies(db *sqlx.DB, post_id int) {
-	// replies := []Reply{}
 	rows, err := db.Queryx(`select * from replies where post_id=$1`, post_id)
 	if err != nil {
 		log.Println(err)
@@ -79,29 +78,9 @@ func getPostReplies(db *sqlx.DB, post_id int) {
 		}
 		fmt.Println(reply)
 	}
-
 }
 
-var db *sqlx.DB
-var err error
-
 func main() {
-	db, err = sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
+	db := sqlx.MustConnect("pgx", os.Getenv("DATABASE_URL"))
 	_ = db
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// post := `insert into posts(title, content) values ($1, $2)`
-	// db.MustExec(post, "wut", "kjskajdksja")
-	// initSchema(db)
-	// createPost(db, "post1", "wtwfwe fhjhew")
-	// createPost(db, "post2", "kasdfkj dklfjksl fjkls")
-	// createPost(db, "post3", "dfks fksdlfk sdlk f")
-	// createReply(db, 1, "jkjkjaskjd")
-	// createReply(db, 1, "jkjkjaskjd")
-	// createReply(db, 1, "jkjkjaskjd")
-	// createReply(db, 2, "jkjkjaskjd")
-	// createReply(db, 2, "jkjkjaskjd")
-	getPostReplies(db, 3)
 }
