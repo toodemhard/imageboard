@@ -40,8 +40,8 @@ func InitSchema(db *sqlx.DB) {
 	db.MustExec(schema)
 }
 
-func createPost(db *sqlx.DB, title string, comment string) {
-	thread := `insert into threads(title, comment) values ($1,$2)`
+func CreatePost(db *sqlx.DB, title string, comment string) {
+	thread := `INSERT INTO threads(title, comment) VALUES ($1,$2)`
 	res, err := db.Exec(thread, title, comment)
 	_ = res
 	if err != nil {
@@ -49,8 +49,8 @@ func createPost(db *sqlx.DB, title string, comment string) {
 	}
 }
 
-func createReply(db *sqlx.DB, thread_id int, comment string) {
-	reply := `insert into replies(thread_id, comment) values ($1, $2)`
+func CreateReply(db *sqlx.DB, thread_id int, comment string) {
+	reply := `INSERT INTO replies(thread_id, comment) VALUES ($1, $2)`
 	res, err := db.Exec(reply, thread_id, comment)
 	_ = res
 	if err != nil {
@@ -60,7 +60,7 @@ func createReply(db *sqlx.DB, thread_id int, comment string) {
 
 func getAllPosts(db *sqlx.DB) {
 	threads := []Thread{}
-	err := db.Select(&threads, "select * from threads")
+	err := db.Select(&threads, "SELECT * FROM threads")
 	if err != nil {
 		log.Println(err)
 	}
@@ -70,7 +70,7 @@ func getAllPosts(db *sqlx.DB) {
 }
 
 func getPostReplies(db *sqlx.DB, thread_id int) {
-	rows, err := db.Queryx(`select * from replies where thread_id=$1`, thread_id)
+	rows, err := db.Queryx(`SELECT * FROM replies WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		log.Println(err)
 	}
