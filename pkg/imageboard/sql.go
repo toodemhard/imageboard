@@ -11,8 +11,8 @@ import (
 
 type Thread struct {
 	Thread_id int
-	Title     string
-	Comment   string
+	Title     string `form:"title"`
+	Comment   string `form:"comment"`
 }
 
 type Reply struct {
@@ -40,12 +40,12 @@ func InitSchema(db *sqlx.DB) {
 	db.MustExec(schema)
 }
 
-func CreatePost(db *sqlx.DB, title string, comment string) {
-	thread := `INSERT INTO threads(title, comment) VALUES ($1,$2)`
-	res, err := db.Exec(thread, title, comment)
+func CreateThread(db *sqlx.DB, thread Thread) {
+	cmd := `INSERT INTO threads(title, comment) VALUES ($1,$2)`
+	res, err := db.Exec(cmd, thread.Title, thread.Comment)
 	_ = res
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 	}
 }
 
@@ -58,7 +58,7 @@ func CreateReply(db *sqlx.DB, thread_id int, comment string) {
 	}
 }
 
-func getAllPosts(db *sqlx.DB) {
+func GetAllThreads(db *sqlx.DB) {
 	threads := []Thread{}
 	err := db.Select(&threads, "SELECT * FROM threads")
 	if err != nil {
@@ -69,7 +69,7 @@ func getAllPosts(db *sqlx.DB) {
 	}
 }
 
-func getPostReplies(db *sqlx.DB, thread_id int) {
+func getThreadReplies(db *sqlx.DB, thread_id int) {
 	rows, err := db.Queryx(`SELECT * FROM replies WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		log.Println(err)
