@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="new-thread" hx-post="/thread" onsubmit="event.preventDefault();">
+        <label for="title">Title</label>
+        <input name="title" type="text"/>
+        <label for="comment">Comment</label>
+        <input name="comment" type="text"/>
+        <input type="submit" value="submit"/>
+    </form>
+
+    <div>
+        {{range .}}
+        <h1>{{.Title}}</h1>
+        <div>{{.Comment}}</div>
+        {{end}}
+    </div>
+
+    <script src="assets/htmx.min.js"></script>
+    <script src="assets/index.js"></script>
+</body>
+</html>
