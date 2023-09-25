@@ -58,15 +58,13 @@ func CreateReply(db *sqlx.DB, thread_id int, comment string) {
 	}
 }
 
-func GetAllThreads(db *sqlx.DB) {
+func GetAllThreads(db *sqlx.DB) ([]Thread, error) {
 	threads := []Thread{}
 	err := db.Select(&threads, "SELECT * FROM threads")
 	if err != nil {
-		log.Println(err)
+		return threads, err
 	}
-	for _, p := range threads {
-		fmt.Println(p)
-	}
+	return threads, nil
 }
 
 func getThreadReplies(db *sqlx.DB, thread_id int) {
