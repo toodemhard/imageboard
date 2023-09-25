@@ -6,8 +6,10 @@
     <title>Document</title>
 </head>
 <body>
-    <form id="new-thread" hx-post="/thread" onsubmit="event.preventDefault();">
+    <form id="new-thread" hx-post="/thread" hx-swap="none" onsubmit="event.preventDefault();">
+        <label for="title">Title</label>
         <input name="title" type="text"/>
+        <label for="comment">Comment</label>
         <input name="comment" type="text"/>
         <input type="submit" value="submit"/>
     </form>
