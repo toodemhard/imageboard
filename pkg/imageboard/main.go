@@ -1,6 +1,7 @@
 package imageboard
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -12,6 +13,10 @@ import (
 )
 
 const publicDir = "../../public/"
+
+type Handler struct {
+	db *sqlx.DB
+}
 
 func (h *Handler) postThread(c echo.Context) error {
 	thread := Thread{}
@@ -46,7 +51,30 @@ func (h *Handler) getThread(c echo.Context) error {
 		replies,
 	}
 
+	fmt.Println(page.Thread.Thread_id)
+
 	return c.Render(http.StatusOK, "thread.html", page)
+}
+
+func (h *Handler) index(c echo.Context) error {
+	threads, err := queryAllThreads(h.db)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "db query failed")
+	}
+	return c.Render(http.StatusOK, "index.html", threads)
+}
+
+func (h *Handler) postReply(c echo.Context) error {
+	fmt.Println("post reply hit!")
+	thread_id, _ := strconv.Atoi(c.Param("id"))
+	reply := Reply{}
+	if err := c.Bind(&reply); err != nil {
+		return err
+	}
+	reply.Thread_id = thread_id
+	CreateReply(h.db, reply)
+
+	return c.HTML(http.StatusOK, "<div>submitted")
 }
 
 type Template struct {
@@ -59,18 +87,6 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 		log.Println(err)
 	}
 	return err
-}
-
-func (h *Handler) index(c echo.Context) error {
-	threads, err := queryAllThreads(h.db)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "db query failed")
-	}
-	return c.Render(http.StatusOK, "index.html", threads)
-}
-
-type Handler struct {
-	db *sqlx.DB
 }
 
 func Run() {
@@ -86,7 +102,7 @@ func Run() {
 	e.Static("/assets", publicDir+"assets")
 	e.POST("/thread", h.postThread)
 	e.GET("/thread/:id", h.getThread)
-	// e.POST("/thread/:id/reply", getThread(db))
+	e.POST("/thread/:id/reply", h.postReply)
 	e.GET("/", h.index)
 	if err := e.Start(":8080"); err != http.ErrServerClosed {
 		log.Fatal(err)

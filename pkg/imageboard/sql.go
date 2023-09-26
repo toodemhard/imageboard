@@ -17,7 +17,7 @@ type Thread struct {
 type Reply struct {
 	Reply_id  int
 	Thread_id int
-	Comment   string
+	Comment   string `form:"comment"`
 }
 
 func ConnectToDB() *sqlx.DB {
@@ -48,9 +48,9 @@ func CreateThread(db *sqlx.DB, thread Thread) {
 	}
 }
 
-func CreateReply(db *sqlx.DB, thread_id int, comment string) {
-	reply := `INSERT INTO replies(thread_id, comment) VALUES ($1, $2)`
-	res, err := db.Exec(reply, thread_id, comment)
+func CreateReply(db *sqlx.DB, reply Reply) {
+	cmd := `INSERT INTO replies(thread_id, comment) VALUES ($1, $2)`
+	res, err := db.Exec(cmd, reply.Thread_id, reply.Comment)
 	_ = res
 	if err != nil {
 		log.Println(err)
@@ -68,7 +68,7 @@ func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
 
 func queryThread(db *sqlx.DB, thread_id int64) (Thread, error) {
 	thread := Thread{}
-	err := db.Get(&thread, `SELECT title,comment FROM threads WHERE thread_id=$1`, thread_id)
+	err := db.Get(&thread, `SELECT thread_id,title,comment FROM threads WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		return thread, err
 	}
