@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form id="new-thread" hx-post="/thread" onsubmit="event.preventDefault();">
+    <form id="new-thread" hx-post="/thread">
         <div>
             <label for="title">Title</label>
             <input name="title" type="text"/>
@@ -28,6 +28,5 @@
     </div>
 
     <script src="assets/htmx.min.js"></script>
-    <script src="assets/index.js"></script>
 </body>
 </html>
