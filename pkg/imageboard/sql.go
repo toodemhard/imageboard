@@ -1,7 +1,6 @@
 package imageboard
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -58,7 +57,7 @@ func CreateReply(db *sqlx.DB, thread_id int, comment string) {
 	}
 }
 
-func GetAllThreads(db *sqlx.DB) ([]Thread, error) {
+func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
 	threads := []Thread{}
 	err := db.Select(&threads, "SELECT * FROM threads")
 	if err != nil {
@@ -67,7 +66,17 @@ func GetAllThreads(db *sqlx.DB) ([]Thread, error) {
 	return threads, nil
 }
 
-func getThreadReplies(db *sqlx.DB, thread_id int) {
+func queryThread(db *sqlx.DB, thread_id int64) (Thread, error) {
+	thread := Thread{}
+	err := db.Get(&thread, `SELECT title,comment FROM threads WHERE thread_id=$1`, thread_id)
+	if err != nil {
+		return thread, err
+	}
+	return thread, nil
+}
+
+func queryThreadReplies(db *sqlx.DB, thread_id int) ([]Reply, error) {
+	replies := []Reply{}
 	rows, err := db.Queryx(`SELECT * FROM replies WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		log.Println(err)
@@ -76,8 +85,9 @@ func getThreadReplies(db *sqlx.DB, thread_id int) {
 		reply := Reply{}
 		err := rows.StructScan(&reply)
 		if err != nil {
-			log.Println(err)
+			return replies, err
 		}
-		fmt.Println(reply)
+		replies = append(replies, reply)
 	}
+	return replies, nil
 }

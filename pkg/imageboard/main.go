@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -23,21 +24,54 @@ func postThread(db *sqlx.DB) echo.HandlerFunc {
 	}
 }
 
+func getThread(db *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			return echo.NewHTTPError(http.StatusNotFound, "invalid thread id")
+		}
+
+		thread, err := queryThread(db, int64(id))
+		if err != nil {
+			return echo.NewHTTPError(http.StatusNotFound, "db query failed")
+		}
+
+		replies, err := queryThreadReplies(db, id)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusNotFound, "db query failed")
+		}
+
+		page := struct {
+			Thread  Thread
+			Replies []Reply
+		}{
+			thread,
+			replies,
+		}
+
+		return c.Render(http.StatusOK, "thread.html", page)
+	}
+}
+
 type Template struct {
 	templates *template.Template
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	err := t.templates.ExecuteTemplate(w, name, data)
+	if err != nil {
+		log.Println(err)
+	}
+	return err
 }
 
-func getThreads(db *sqlx.DB) echo.HandlerFunc {
+func index(db *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		threads, err := GetAllThreads(db)
+		threads, err := queryAllThreads(db)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "db query failed")
 		}
-		return c.Render(http.StatusOK, "thread.html", threads)
+		return c.Render(http.StatusOK, "index.html", threads)
 	}
 }
 
@@ -53,7 +87,8 @@ func Run() {
 
 	e.Static("/assets", publicDir+"assets")
 	e.POST("/thread", postThread(db))
-	e.GET("/", getThreads(db))
+	e.GET("/thread/:id", getThread(db))
+	e.GET("/", index(db))
 	if err := e.Start(":8080"); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
