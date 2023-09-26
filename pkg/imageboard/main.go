@@ -1,7 +1,6 @@
 package imageboard
 
 import (
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -51,8 +50,6 @@ func (h *Handler) getThread(c echo.Context) error {
 		replies,
 	}
 
-	fmt.Println(page.Thread.Thread_id)
-
 	return c.Render(http.StatusOK, "thread.html", page)
 }
 
@@ -65,7 +62,6 @@ func (h *Handler) index(c echo.Context) error {
 }
 
 func (h *Handler) postReply(c echo.Context) error {
-	fmt.Println("post reply hit!")
 	thread_id, _ := strconv.Atoi(c.Param("id"))
 	reply := Reply{}
 	if err := c.Bind(&reply); err != nil {
