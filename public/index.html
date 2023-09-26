@@ -22,9 +22,11 @@
 
     <div>
         {{range .}}
-        <h1>{{.Title}}</h1>
-        <div>{{.Comment}}</div>
-        {{end}}
+        <a href="/thread/{{.Thread_id}}">
+            <h1>{{.Title}}</h1>
+            <div>{{.Comment}}</div>
+            {{end}}
+        </a>
     </div>
 
     <script src="/assets/htmx.min.js"></script>

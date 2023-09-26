@@ -59,7 +59,7 @@ func CreateReply(db *sqlx.DB, reply Reply) {
 
 func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
 	threads := []Thread{}
-	err := db.Select(&threads, "SELECT * FROM threads")
+	err := db.Select(&threads, "SELECT thread_id, title, comment FROM threads")
 	if err != nil {
 		return threads, err
 	}
