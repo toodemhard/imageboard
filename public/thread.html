@@ -6,6 +6,16 @@
     <title>Document</title>
 </head>
 <body>
+    <form id="idfk" hx-post="/thread/{{.Thread.Thread_id}}/reply">
+        <div>
+            <label for="comment">Comment</label>
+            <input name="comment" type="text"/>
+        </div>
+        <div>
+            <input type="submit" value="submit"/>
+        </div>
+    </form>
+
     <h1>{{.Thread.Title}}</h1>
     <div>
         {{.Thread.Comment}}
@@ -17,5 +27,7 @@
         {{.Comment}}
     </div>
     {{end}}
+
+    <script src="../assets/htmx.min.js"></script>
 </body>
 </html>
