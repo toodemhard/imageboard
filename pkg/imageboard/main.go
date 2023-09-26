@@ -46,7 +46,7 @@ func Run() {
 	e := echo.New()
 
 	t := &Template{
-		template.Must(template.ParseFiles(publicDir + "thread.html")),
+		template.Must(template.ParseGlob(publicDir + "*.html")),
 	}
 
 	e.Renderer = t
