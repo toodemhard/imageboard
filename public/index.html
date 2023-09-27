@@ -23,7 +23,7 @@
     <div>
         {{range .}}
         <a href="/thread/{{.Thread_id}}">
-            <h1>{{.Title}}</h1>
+            <h1>{{.Title}}</h1><span>{{.Time}}</span>
             <div>{{.Comment}}</div>
             {{end}}
         </a>
