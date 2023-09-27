@@ -1,6 +1,7 @@
 package imageboard
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -12,12 +13,14 @@ type Thread struct {
 	Thread_id int
 	Title     string `form:"title"`
 	Comment   string `form:"comment"`
+	Time      string `db:"to_char"`
 }
 
 type Reply struct {
 	Reply_id  int
 	Thread_id int
 	Comment   string `form:"comment"`
+	Time      string `db:"to_char"`
 }
 
 func ConnectToDB() *sqlx.DB {
@@ -44,7 +47,7 @@ func InitSchema(db *sqlx.DB) {
 }
 
 func CreateThread(db *sqlx.DB, thread Thread) {
-	cmd := `INSERT INTO threads(title, comment) VALUES ($1,$2)`
+	cmd := `INSERT INTO threads(title, comment, time) VALUES ($1,$2, CURRENT_TIMESTAMP)`
 	res, err := db.Exec(cmd, thread.Title, thread.Comment)
 	_ = res
 	if err != nil {
@@ -53,7 +56,7 @@ func CreateThread(db *sqlx.DB, thread Thread) {
 }
 
 func CreateReply(db *sqlx.DB, reply Reply) {
-	cmd := `INSERT INTO replies(thread_id, comment) VALUES ($1, $2)`
+	cmd := `INSERT INTO replies(thread_id, comment, time) VALUES ($1, $2, CURRENT_TIMESTAMP)`
 	res, err := db.Exec(cmd, reply.Thread_id, reply.Comment)
 	_ = res
 	if err != nil {
@@ -63,8 +66,9 @@ func CreateReply(db *sqlx.DB, reply Reply) {
 
 func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
 	threads := []Thread{}
-	err := db.Select(&threads, "SELECT thread_id, title, comment FROM threads")
+	err := db.Select(&threads, `SELECT thread_id, title, comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS') FROM threads`)
 	if err != nil {
+		fmt.Println(err)
 		return threads, err
 	}
 	return threads, nil
@@ -72,7 +76,7 @@ func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
 
 func queryThread(db *sqlx.DB, thread_id int64) (Thread, error) {
 	thread := Thread{}
-	err := db.Get(&thread, `SELECT thread_id,title,comment FROM threads WHERE thread_id=$1`, thread_id)
+	err := db.Get(&thread, `SELECT thread_id,title,comment,to_char(time, 'DD/MM/YYYY HH24:MI:SS') FROM threads WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		return thread, err
 	}
@@ -81,7 +85,7 @@ func queryThread(db *sqlx.DB, thread_id int64) (Thread, error) {
 
 func queryThreadReplies(db *sqlx.DB, thread_id int) ([]Reply, error) {
 	replies := []Reply{}
-	rows, err := db.Queryx(`SELECT * FROM replies WHERE thread_id=$1`, thread_id)
+	rows, err := db.Queryx(`SELECT comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS') FROM replies WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		log.Println(err)
 	}
