@@ -6,7 +6,11 @@
     <title>Document</title>
 </head>
 <body>
-    <form id="new-thread" hx-post="/thread">
+    <form id="new-thread" hx-post="/thread" enctype="multipart/form-data">
+        <div>
+            <label for="image">Image</label>
+            <input name="image" type="file"/>
+        </div>
         <div>
             <label for="title">Title</label>
             <input name="title" type="text"/>
