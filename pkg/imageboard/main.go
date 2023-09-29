@@ -19,10 +19,20 @@ type Handler struct {
 
 func (h *Handler) postThread(c echo.Context) error {
 	thread := Thread{}
+	img, err := c.FormFile("image")
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
 	if err := c.Bind(&thread); err != nil {
 		return err
 	}
-	CreateThread(h.db, thread)
+
+	if err := CreateThread(h.db, thread, img); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
 	return c.HTML(http.StatusOK, `<div>done it m8`)
 }
 
