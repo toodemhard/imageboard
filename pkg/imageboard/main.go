@@ -66,7 +66,7 @@ func (h *Handler) getThread(c echo.Context) error {
 func (h *Handler) index(c echo.Context) error {
 	threads, err := queryAllThreads(h.db)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "db query failed")
+		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 	return c.Render(http.StatusOK, "index.html", threads)
 }
@@ -95,6 +95,10 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return err
 }
 
+func getImage(c echo.Context) error {
+	return c.File(imagesDir + c.Param("id"))
+}
+
 func Run() {
 	db := ConnectToDB()
 	e := echo.New()
@@ -105,6 +109,7 @@ func Run() {
 
 	h := Handler{db}
 
+	e.GET("/images/:id", getImage)
 	e.Static("/assets", publicDir+"assets")
 	e.POST("/thread", h.postThread)
 	e.GET("/thread/:id", h.getThread)

@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form id="idfk" hx-post="/thread/{{.Thread.Thread_id}}/reply">
+    <form id="idfk" hx-post="/thread/{{.Thread.Id}}/reply">
         <div>
             <label for="comment">Comment</label>
             <input name="comment" type="text"/>
@@ -16,6 +16,8 @@
         </div>
     </form>
 
+
+    <img src="/images/{{.Thread.Image_id}}">
     <h1>{{.Thread.Title}}</h1>
     <div>
         {{.Thread.Comment}}

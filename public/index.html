@@ -26,11 +26,12 @@
 
     <div>
         {{range .}}
-        <a href="/thread/{{.Thread_id}}">
+        <a href="/thread/{{.Id}}">
+            <img src="/images/{{.Image_id}}">
             <h1>{{.Title}}</h1><span>{{.Time}}</span>
             <div>{{.Comment}}</div>
-            {{end}}
         </a>
+        {{end}}
     </div>
 
     <script src="/assets/htmx.min.js"></script>
