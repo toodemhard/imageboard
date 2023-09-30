@@ -63,7 +63,7 @@ func (h *Handler) getThread(c echo.Context) error {
 	return c.Render(http.StatusOK, "thread.html", page)
 }
 
-func (h *Handler) index(c echo.Context) error {
+func (h *Handler) getIndex(c echo.Context) error {
 	threads, err := queryAllThreads(h.db)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError)
@@ -114,7 +114,7 @@ func Run() {
 	e.POST("/thread", h.postThread)
 	e.GET("/thread/:id", h.getThread)
 	e.POST("/thread/:id/reply", h.postReply)
-	e.GET("/", h.index)
+	e.GET("/", h.getIndex)
 	if err := e.Start(":8080"); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
