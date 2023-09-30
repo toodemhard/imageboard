@@ -66,39 +66,14 @@ func InitSchema(db *sqlx.DB) {
 }
 
 func CreateThread(db *sqlx.DB, thread Thread, img *multipart.FileHeader) error {
-	tx, err := db.Begin()
+	tx, err := db.Beginx()
+
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
 
-	var uuid string
-	row := tx.QueryRow(`SELECT gen_random_uuid()`)
-	err = row.Scan(&uuid)
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-		return err
-	}
-
-	filePath := imagesDir + uuid
-	srcFile, err := img.Open()
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-		return err
-	}
-	dstFile, err := os.Create(filePath)
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-		return err
-	}
-	defer srcFile.Close()
-	defer dstFile.Close()
-	io.Copy(dstFile, srcFile)
-
-	_, err = tx.Exec(`INSERT INTO images(id, name) VALUES ($1, $2)`, uuid, img.Filename)
+	imageId, err := CreateImage(tx, img)
 	if err != nil {
 		log.Println(err)
 		tx.Rollback()
@@ -106,7 +81,7 @@ func CreateThread(db *sqlx.DB, thread Thread, img *multipart.FileHeader) error {
 	}
 
 	cmd := `INSERT INTO threads(title, comment, time, image_id) VALUES ($1,$2, CURRENT_TIMESTAMP, $3)`
-	_, err = tx.Exec(cmd, thread.Title, thread.Comment, uuid)
+	_, err = tx.Exec(cmd, thread.Title, thread.Comment, imageId)
 	if err != nil {
 		log.Println(err)
 		tx.Rollback()
@@ -116,6 +91,35 @@ func CreateThread(db *sqlx.DB, thread Thread, img *multipart.FileHeader) error {
 	tx.Commit()
 
 	return nil
+}
+
+func CreateImage(tx *sqlx.Tx, img *multipart.FileHeader) (string, error) {
+	var uuid string
+	row := tx.QueryRow(`SELECT gen_random_uuid()`)
+	err := row.Scan(&uuid)
+	if err != nil {
+		return uuid, err
+	}
+
+	filePath := imagesDir + uuid
+	srcFile, err := img.Open()
+	if err != nil {
+		return uuid, err
+	}
+	dstFile, err := os.Create(filePath)
+	if err != nil {
+		return uuid, err
+	}
+	defer srcFile.Close()
+	defer dstFile.Close()
+	io.Copy(dstFile, srcFile)
+
+	_, err = tx.Exec(`INSERT INTO images(id, name) VALUES ($1, $2)`, uuid, img.Filename)
+	if err != nil {
+		return uuid, err
+	}
+
+	return uuid, nil
 }
 
 func CreateReply(db *sqlx.DB, reply Reply) {
