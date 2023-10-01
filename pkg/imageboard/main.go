@@ -1,11 +1,13 @@
 package imageboard
 
 import (
+	"bytes"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
+	txt "text/template"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -87,14 +89,24 @@ func (h *Handler) getIndex(c echo.Context) error {
 }
 
 type Template struct {
-	templates *template.Template
+	pages  *template.Template
+	layout *txt.Template
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	err := t.templates.ExecuteTemplate(w, name, data)
+	var pageContent bytes.Buffer
+	err := t.pages.ExecuteTemplate(&pageContent, name, data)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
+
+	page := struct {
+		Content string
+	}{
+		pageContent.String(),
+	}
+
+	t.layout.Execute(w, page)
 	return err
 }
 
@@ -107,7 +119,8 @@ func Run() {
 	e := echo.New()
 
 	e.Renderer = &Template{
-		template.Must(template.ParseGlob(publicDir + "*.html")),
+		template.Must(template.ParseGlob(publicDir + "pages/*.html")),
+		txt.Must(txt.ParseFiles(publicDir + "layout.html")),
 	}
 
 	h := Handler{db}

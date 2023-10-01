@@ -1,0 +1,28 @@
+<h1 class="underline">hi bitch</h1>
+<form id="new-thread" hx-post="/thread" enctype="multipart/form-data">
+    <div>
+        <label for="image">Image</label>
+        <input name="image" type="file"/>
+    </div>
+    <div>
+        <label for="title">Title</label>
+        <input name="title" type="text"/>
+    </div>
+    <div>
+        <label for="comment">Comment</label>
+        <input name="comment" type="text"/>
+    </div>
+    <div>
+        <input type="submit" value="submit"/>
+    </div>
+</form>
+
+<div>
+    {{range .}}
+    <a href="/thread/{{.Id}}">
+        <img src="/images/{{.Image_id}}">
+        <h1>{{.Title}}</h1><span>{{.Time}}</span>
+        <div>{{.Comment}}</div>
+    </a>
+    {{end}}
+</div>

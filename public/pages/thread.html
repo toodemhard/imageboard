@@ -1,0 +1,30 @@
+<form id="idfk" hx-post="/thread/{{.Thread.Id}}/reply" enctype="multipart/form-data">
+    <div>
+        <input name="image" type="file">
+    </div>
+    <div>
+        <label for="comment">Comment</label>
+        <input name="comment" type="text">
+    </div>
+    <div>
+        <input type="submit" value="submit"/>
+    </div>
+</form>
+
+
+<img src="/images/{{.Thread.Image_id}}">
+<h1>{{.Thread.Title}}</h1>
+<div>
+    <span>{{.Thread.Comment}}</span><span>{{.Thread.Time}}</span>
+</div>
+
+
+{{range .Replies}}
+<div>
+    <br>
+    {{if .Image_id.Valid}}
+    <img src="/images/{{.Image_id.String}}">
+    {{end}}
+    <span>{{.Comment}}</span><span> {{.Time}}</span>
+</div>
+{{end}}
