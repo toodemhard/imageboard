@@ -1,2 +1,4 @@
 *.env
 images/
+node_modules/
+public/assets/output.css
