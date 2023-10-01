@@ -70,13 +70,11 @@ func CreateThread(db *sqlx.DB, thread Thread, img *multipart.FileHeader) error {
 	tx, err := db.Beginx()
 
 	if err != nil {
-		log.Println(err.Error())
 		return err
 	}
 
 	imageId, err := CreateImage(tx, img)
 	if err != nil {
-		log.Println(err)
 		tx.Rollback()
 		return err
 	}
@@ -84,7 +82,6 @@ func CreateThread(db *sqlx.DB, thread Thread, img *multipart.FileHeader) error {
 	cmd := `INSERT INTO threads(title, comment, time, image_id) VALUES ($1,$2, CURRENT_TIMESTAMP, $3)`
 	_, err = tx.Exec(cmd, thread.Title, thread.Comment, imageId)
 	if err != nil {
-		log.Println(err)
 		tx.Rollback()
 		return err
 	}
@@ -138,10 +135,10 @@ func CreateReply(db *sqlx.DB, reply Reply, img *multipart.FileHeader) error {
 		}
 
 		cmd := `INSERT INTO replies(thread_id, comment, time, image_id) VALUES ($1, $2, CURRENT_TIMESTAMP, $3)`
-		res, err := tx.Exec(cmd, reply.Thread_id, reply.Comment, imageId)
-		_ = res
+		_, err = tx.Exec(cmd, reply.Thread_id, reply.Comment, imageId)
 		if err != nil {
-			log.Println(err)
+			tx.Rollback()
+			return err
 		}
 
 		tx.Commit()
@@ -149,11 +146,12 @@ func CreateReply(db *sqlx.DB, reply Reply, img *multipart.FileHeader) error {
 	}
 
 	cmd := `INSERT INTO replies(thread_id, comment, time) VALUES ($1, $2, CURRENT_TIMESTAMP)`
-	res, err := tx.Exec(cmd, reply.Thread_id, reply.Comment)
-	_ = res
+	_, err = tx.Exec(cmd, reply.Thread_id, reply.Comment)
 	if err != nil {
-		log.Println(err)
+		tx.Rollback()
+		return err
 	}
+
 	tx.Commit()
 	return nil
 }
