@@ -17,6 +17,20 @@ type Handler struct {
 	db *sqlx.DB
 }
 
+func (h *Handler) postReply(c echo.Context) error {
+	thread_id, _ := strconv.Atoi(c.Param("id"))
+	img, _ := c.FormFile("image")
+	reply := Reply{}
+	if err := c.Bind(&reply); err != nil {
+		return err
+	}
+
+	reply.Thread_id = thread_id
+	CreateReply(h.db, reply, img)
+
+	return c.HTML(http.StatusOK, "<div>submitted")
+}
+
 func (h *Handler) postThread(c echo.Context) error {
 	thread := Thread{}
 	img, err := c.FormFile("image")
@@ -49,6 +63,7 @@ func (h *Handler) getThread(c echo.Context) error {
 
 	replies, err := queryThreadReplies(h.db, id)
 	if err != nil {
+		log.Println(err)
 		return echo.NewHTTPError(http.StatusNotFound, "db query failed")
 	}
 
@@ -69,18 +84,6 @@ func (h *Handler) getIndex(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 	return c.Render(http.StatusOK, "index.html", threads)
-}
-
-func (h *Handler) postReply(c echo.Context) error {
-	thread_id, _ := strconv.Atoi(c.Param("id"))
-	reply := Reply{}
-	if err := c.Bind(&reply); err != nil {
-		return err
-	}
-	reply.Thread_id = thread_id
-	CreateReply(h.db, reply)
-
-	return c.HTML(http.StatusOK, "<div>submitted")
 }
 
 type Template struct {

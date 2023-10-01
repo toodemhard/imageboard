@@ -6,7 +6,10 @@
     <title>Document</title>
 </head>
 <body>
-    <form id="idfk" hx-post="/thread/{{.Thread.Id}}/reply">
+    <form id="idfk" hx-post="/thread/{{.Thread.Id}}/reply" enctype="multipart/form-data">
+        <div>
+            <input name="image" type="file">
+        </div>
         <div>
             <label for="comment">Comment</label>
             <input name="comment" type="text"/>
@@ -27,6 +30,9 @@
     {{range .Replies}}
     <div>
         <br>
+        {{if .Image_id.Valid}}
+        <img src="/images/{{.Image_id.String}}">
+        {{end}}
         <span>{{.Comment}}</span><span> {{.Time}}</span>
     </div>
     {{end}}

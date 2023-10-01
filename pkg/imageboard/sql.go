@@ -1,6 +1,7 @@
 package imageboard
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"log"
@@ -24,7 +25,7 @@ type Reply struct {
 	Thread_id int
 	Comment   string `form:"comment"`
 	Time      string `db:"to_char"`
-	Image_id  string
+	Image_id  sql.NullString
 }
 
 type Image struct {
@@ -122,13 +123,39 @@ func CreateImage(tx *sqlx.Tx, img *multipart.FileHeader) (string, error) {
 	return uuid, nil
 }
 
-func CreateReply(db *sqlx.DB, reply Reply) {
+func CreateReply(db *sqlx.DB, reply Reply, img *multipart.FileHeader) error {
+	tx, err := db.Beginx()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if img != nil {
+		imageId, err := CreateImage(tx, img)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		cmd := `INSERT INTO replies(thread_id, comment, time, image_id) VALUES ($1, $2, CURRENT_TIMESTAMP, $3)`
+		res, err := tx.Exec(cmd, reply.Thread_id, reply.Comment, imageId)
+		_ = res
+		if err != nil {
+			log.Println(err)
+		}
+
+		tx.Commit()
+		return nil
+	}
+
 	cmd := `INSERT INTO replies(thread_id, comment, time) VALUES ($1, $2, CURRENT_TIMESTAMP)`
-	res, err := db.Exec(cmd, reply.Thread_id, reply.Comment)
+	res, err := tx.Exec(cmd, reply.Thread_id, reply.Comment)
 	_ = res
 	if err != nil {
 		log.Println(err)
 	}
+	tx.Commit()
+	return nil
 }
 
 func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
@@ -152,7 +179,7 @@ func queryThread(db *sqlx.DB, thread_id int64) (Thread, error) {
 
 func queryThreadReplies(db *sqlx.DB, thread_id int) ([]Reply, error) {
 	replies := []Reply{}
-	rows, err := db.Queryx(`SELECT comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS') FROM replies WHERE thread_id=$1`, thread_id)
+	rows, err := db.Queryx(`SELECT comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS'), image_id FROM replies WHERE thread_id=$1`, thread_id)
 	if err != nil {
 		log.Println(err)
 	}
