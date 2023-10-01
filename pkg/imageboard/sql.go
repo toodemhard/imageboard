@@ -160,7 +160,7 @@ func CreateReply(db *sqlx.DB, reply Reply, img *multipart.FileHeader) error {
 
 func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
 	threads := []Thread{}
-	err := db.Select(&threads, `SELECT id, title, comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS'), image_id FROM threads`)
+	err := db.Select(&threads, `SELECT id, title, comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS'), image_id FROM threads ORDER BY time DESC`)
 	if err != nil {
 		fmt.Println(err)
 		return threads, err
