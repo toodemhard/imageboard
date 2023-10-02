@@ -15,7 +15,7 @@ import (
 const publicDir = "../../public/"
 
 func Run() {
-	if len(os.Args) > 0 {
+	if len(os.Args) > 1 {
 		flag := os.Args[1]
 		if flag == "--dev" || flag == "-d" {
 			fmt.Println("dev mode")
