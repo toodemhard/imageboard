@@ -47,17 +47,20 @@ func (h *Handler) postThread(c echo.Context) error {
 func (h *Handler) getThread(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "invalid thread id")
+		c.Logger().Error(err)
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
 	thread, err := queryThread(h.db, int64(id))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "db query failed")
+		c.Logger().Error(err)
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
 	replies, err := queryThreadReplies(h.db, id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "db query failed")
+		c.Logger().Error(err)
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
 	page := struct {
@@ -74,6 +77,7 @@ func (h *Handler) getThread(c echo.Context) error {
 func (h *Handler) getIndex(c echo.Context) error {
 	threads, err := queryAllThreads(h.db)
 	if err != nil {
+		c.Logger().Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 	return c.Render(http.StatusOK, "index.html", threads)

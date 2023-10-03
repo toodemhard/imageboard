@@ -33,7 +33,7 @@ type Image struct {
 	name string
 }
 
-const imagesDir = "../../images/"
+const imagesDir = "images/"
 
 func ConnectToDB() *sqlx.DB {
 	return sqlx.MustConnect("pgx", os.Getenv("DATABASE_URL"))
