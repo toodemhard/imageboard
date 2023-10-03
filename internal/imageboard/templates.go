@@ -1,7 +1,6 @@
 package imageboard
 
 import (
-	"errors"
 	"html/template"
 	"io"
 	"os"
@@ -62,10 +61,6 @@ func (l *LiveTemplate) Render(w io.Writer, name string, data interface{}, c echo
 
 func ComposeTemplates() error {
 	base := txt.Must(txt.ParseFiles(srcDir + "base.html"))
-	err := os.Mkdir(outDir, 0777)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		return err
-	}
 
 	pages, err := os.ReadDir(srcDir + "pages")
 	if err != nil {
