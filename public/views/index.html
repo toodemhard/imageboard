@@ -1,0 +1,35 @@
+{{template "header.html"}}
+
+<h1 class="underline text-4xl font-bold">fksadfjskdf adskf jksaldfj</h1>
+<form id="new-thread" hx-post="/thread" enctype="multipart/form-data" class="max-w-xl mx-auto">
+    <div>
+        <label for="image">Image</label>
+        <input name="image" type="file" />
+    </div>
+    <div>
+        <input name="title" placeholder="title" type="text"
+            class="border-neutral-300 border p-1 rounded my-1 w-full focus:border-black outline-none" />
+    </div>
+    <div>
+        <textarea name="comment" placeholder="comment" type="text" rows="3"
+            class="border-neutral-300 border p-1 rounded my-1 w-full focus:border-black outline-none h-fit"></textarea>
+    </div>
+    <div>
+        <input type="submit" value="submit" class="bg-black text-white p-2 px-4 font-bold rounded-md cursor-pointer" />
+    </div>
+</form>
+
+<div class="">
+    {{range .}}
+    <div class="max-w-xl mx-auto">
+        <a href="/thread/{{.Id}}" class="bg-white">
+            <h2 class="text-2xl font-bold">{{.Title}}</h2>
+            <span>{{.Time}}</span>
+            <img class="mx-auto" src="/images/{{.Image_id}}" />
+            <div class="truncate">{{.Comment}}</div>
+        </a>
+    </div>
+    {{end}}
+</div>
+
+{{template "footer.html"}}

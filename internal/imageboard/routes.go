@@ -8,7 +8,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const assetsDir = "public/assets/"
+const publicDir = "public/"
+const assetsDir = publicDir + "assets/"
 
 func Run() {
 	db := ConnectToDB()
