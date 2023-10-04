@@ -1,6 +1,6 @@
 package main
 
-import "github.com/toodemhard/imageboard/pkg/imageboard"
+import "github.com/toodemhard/imageboard/internal/imageboard"
 
 func main() {
 	db := imageboard.ConnectToDB()
