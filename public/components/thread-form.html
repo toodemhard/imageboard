@@ -1,0 +1,23 @@
+<div id="container">
+    <div hx-get="close-form" hx-target="#container" hx-swap="outerHTML" class="text-2xl max-w-fit mx-auto">[<a
+            href="#">Close Form</a>]
+    </div>
+    <form hx-post="/thread" enctype="multipart/form-data" class="max-w-xl mx-auto">
+        <div>
+            <input name="image" type="file"
+                class="w-full file:hover:cursor-pointer file:text-white file:border-none file:bg-black" />
+        </div>
+        <div>
+            <input name="title" placeholder="title" type="text"
+                class="border-neutral-300 border p-1 rounded my-1 w-full focus:border-black outline-none" />
+        </div>
+        <div>
+            <textarea name="comment" placeholder="comment" type="text" rows="3"
+                class="border-neutral-300 border p-1 rounded my-1 w-full focus:border-black outline-none h-fit"></textarea>
+        </div>
+        <div>
+            <input type="submit" value="submit"
+                class="bg-black text-white p-2 px-4 font-bold rounded-md cursor-pointer" />
+        </div>
+    </form>
+</div>

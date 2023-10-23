@@ -26,6 +26,14 @@ func (h *Handler) postReply(c echo.Context) error {
 	return c.HTML(http.StatusOK, "<div>submitted")
 }
 
+func openForm(c echo.Context) error {
+	return c.Render(http.StatusOK, "thread-form.html", nil)
+}
+
+func closeForm(c echo.Context) error {
+	return c.Render(http.StatusOK, "thread-open.html", nil)
+}
+
 func (h *Handler) postThread(c echo.Context) error {
 	thread := Thread{}
 	img, err := c.FormFile("image")
@@ -41,7 +49,8 @@ func (h *Handler) postThread(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 
-	return c.HTML(http.StatusOK, `<div>done it m8`)
+	return c.HTML(http.StatusOK, "")
+	// return c.Render(http.StatusOK, "thread-entry.html")
 }
 
 func (h *Handler) getThread(c echo.Context) error {

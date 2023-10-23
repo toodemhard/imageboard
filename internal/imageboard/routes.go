@@ -42,6 +42,8 @@ func Run() {
 	e.GET("/thread/:id", h.getThread)
 	e.POST("/thread/:id/reply", h.postReply)
 	e.GET("/", h.getIndex)
+	e.GET("/open-form", openForm)
+	e.GET("/close-form", closeForm)
 	if err := e.Start(":8080"); err != http.ErrServerClosed {
 		e.Logger.Fatal(err)
 	}
