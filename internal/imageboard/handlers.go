@@ -84,7 +84,7 @@ func (h *Handler) getThread(c echo.Context) error {
 }
 
 func (h *Handler) getIndex(c echo.Context) error {
-	threads, err := queryAllThreads(h.db)
+	threads, err := QueryAllThreads(h.db)
 	if err != nil {
 		c.Logger().Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError)

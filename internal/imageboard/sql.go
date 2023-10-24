@@ -13,11 +13,12 @@ import (
 )
 
 type Thread struct {
-	Id       int
-	Title    string `form:"title"`
-	Comment  string `form:"comment"`
-	Time     string `db:"to_char"`
-	Image_id string
+	Id         int
+	Title      string `form:"title"`
+	Comment    string `form:"comment"`
+	Time       string `db:"to_char"`
+	Image_id   string
+	ReplyCount int `db:"count"`
 }
 
 type Reply struct {
@@ -156,9 +157,10 @@ func CreateReply(db *sqlx.DB, reply Reply, img *multipart.FileHeader) error {
 	return nil
 }
 
-func queryAllThreads(db *sqlx.DB) ([]Thread, error) {
+func QueryAllThreads(db *sqlx.DB) ([]Thread, error) {
 	threads := []Thread{}
-	err := db.Select(&threads, `SELECT id, title, comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS'), image_id FROM threads ORDER BY time DESC`)
+	err := db.Select(&threads, `SELECT id, title, comment, to_char(time, 'DD/MM/YYYY HH24:MI:SS'), image_id, 
+    (select count(*) FROM replies where replies.thread_id = threads.id) FROM threads ORDER BY time DESC`)
 	if err != nil {
 		fmt.Println(err)
 		return threads, err
